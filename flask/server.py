@@ -9,8 +9,8 @@ from app.services.neural.model import get_model
 app = Flask(__name__)
 CORS(app)
 
-app.config['ENV'] = 'development'
-app.config['DEBUG'] = True
+# app.config['ENV'] = 'development'
+# app.config['DEBUG'] = True
 
 app.register_blueprint(search)
 
@@ -27,4 +27,4 @@ def download_nltk_packages():
 
 download_nltk_packages()
 
-app.run("0.0.0.0", 8080)
+app.run("0.0.0.0", 80)

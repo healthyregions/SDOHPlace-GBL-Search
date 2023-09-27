@@ -3,3 +3,4 @@ Flask-Cors===4.0.0
 pymongo===4.5.0
 pysolr===3.9.0
 sentence_transformers
+requests

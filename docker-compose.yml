@@ -2,7 +2,7 @@ services:
     nginx:
         image: nginx
         build:
-            context: .\nginx
+            context: ./nginx
             dockerfile: dockerfile-nginx
         ports:
             - 8080:8080
@@ -12,5 +12,5 @@ services:
         depends_on:
             - nginx
         image: api
-        build: .\flask
+        build: ./flask
         restart: always
