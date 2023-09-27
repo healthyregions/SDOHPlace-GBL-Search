@@ -1,27 +1,30 @@
 from flask import Flask
 from flask_cors import CORS
-import json
+from app.views.search import search
 
-from app.query import Query
+import nltk
 
-# from app.services.db import get_db
-
-from flask import request
+from app.services.neural.model import get_model
 
 app = Flask(__name__)
 CORS(app)
 
-# with app.app_context():
-# 	pass
-# 	#get_db()
+app.config['ENV'] = 'development'
+app.config['DEBUG'] = True
+
+app.register_blueprint(search)
+
+with app.app_context():
+	get_model()
 
 
-@app.route("/search")
-def search():
-	print("HELLLLLLO")
-	query = Query()
-	q = request.args.get('q')
-	return json.dumps(query.get_query_expansion(q))
+def download_nltk_packages():
+	nltk.download('wordnet')
+	nltk.download('punkt')
+	nltk.download('stopwords')
+	nltk.download('averaged_perceptron_tagger')
 
+
+download_nltk_packages()
 
 app.run("0.0.0.0", 8080)
