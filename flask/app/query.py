@@ -15,12 +15,17 @@ class Query:
 		pass
 
 	def get_query_expansion(self, query):
-		q = query.split(" ") if query else []
-		print(model)
-		return {
-			"query": q,
-			"syns": Synonyms().generate_tokens(query)
-		}
+		expanded = dict()
+
+		for word in query.split(" "):
+			tokens = Synonyms().generate_tokens(word)
+			for token in tokens.keys():
+				expanded[token] = expanded.get(token, 0)
+				expanded[token] += tokens[token]
+		expanded = dict(sorted(expanded.items(), key=lambda item: -item[1]))
+		print(expanded)
+
+		return " ".join(list(expanded.keys()))
 
 
 class Synonyms:

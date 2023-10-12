@@ -25,17 +25,63 @@ def semantic_search():
 
 @search.route('/<path:dynamic_route>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def handle_all(dynamic_route):
-	print(dynamic_route, request.args)
-	params = "?"
-	for key in request.args:
-		if params != "?":
-			params += "&"
-		params += key + "=" + request.args.get(key)
-	print(f"{SOLR_URL}/{dynamic_route}{params}")
-	response = requests.get(f"{SOLR_URL}/{dynamic_route}{params}")
-	if response.status_code == 200:
-		print("sucessfully fetched the data with parameters provided")
-		print(json.dumps(response.json()))
-	else:
-		print(f"Hello person, there's a {response.status_code} error with your request")
-	return Response(f"Handling {dynamic_route}", 200)
+	if request.method == 'GET':
+		if dynamic_route.startswith("solr/blacklight-core/select"):
+			headers = request.headers
+			params = dict(request.args)
+
+			if params.get("q"):
+				params["df"] = "text"
+
+				query = Query()
+				params["q"] = query.get_query_expansion(params["q"])
+
+				target_url = f"{SOLR_URL}/{dynamic_route.replace('select', 'search')}"
+			else:
+				target_url = f"{SOLR_URL}/{dynamic_route}"
+
+			# Forward the GET request
+			response = requests.get(target_url, headers=headers, params=params)
+
+			return response.json()
+		else:
+			# Retrieve incoming headers and query parameters
+			headers = request.headers
+			params = request.args
+			# Forward the GET request
+			target_url = f"{SOLR_URL}/{dynamic_route}"
+			response = requests.get(target_url, headers=headers, params=params)
+
+			return response.json()
+	elif request.method == 'POST':
+		# Retrieve incoming JSON data and headers
+		data = request.json
+		headers = request.headers
+
+		# Forward the POST request
+		target_url = f"{SOLR_URL}/{dynamic_route}"
+		response = requests.post(target_url, json=data, headers=headers)
+
+		return response.json()
+
+	elif request.method == 'PUT':
+		# Retrieve incoming JSON data and headers
+		data = request.json
+		headers = request.headers
+
+		# Forward the PUT request
+		target_url = f"{SOLR_URL}/{dynamic_route}"
+		response = requests.put(target_url, json=data, headers=headers)
+
+		return response.json()
+
+	elif request.method == 'DELETE':
+
+		# Retrieve incoming headers
+		headers = request.headers
+
+		# Forward the DELETE request
+		target_url = f"{SOLR_URL}/{dynamic_route}"
+		response = requests.delete(target_url, headers=headers)
+
+		return response.json()
